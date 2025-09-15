@@ -1,0 +1,79 @@
+[BITS 16]
+[ORG 0x7c00]
+
+mov [boot_drive], dl
+
+xor ax, ax ; setting stack
+mov ss, ax
+mov sp, 0x7c00
+
+mov ax, 0x7e0 ; setting es 
+mov es, ax
+xor bx, bx
+
+mov ax, N
+xor dx, dx
+mov cx, 0x200
+div cx ; 512
+test dx, dx
+jz .no_extra
+inc ax
+
+.no_extra:
+mov word [sectors_count], ax
+
+mov [cylinder], byte 0
+mov [head], byte 0
+mov [sector], byte 2
+
+.loop:
+
+mov ah, 0x2
+mov al, 1
+mov ch, [cylinder]
+mov cl, [sector]
+mov dh, [head]
+mov dl, [boot_drive]
+
+int 0x13
+
+jc .error
+
+mov ax, es
+add ax, 0x20 ; = 32 = 512 / 16
+mov es, ax
+xor bx, bx
+
+inc byte [sector]
+cmp byte [sector], 18 ; sectors count on floppy
+jle .check_sectors
+
+mov byte [sector], 1
+inc byte [head]
+cmp byte [head], 2
+jl .check_sectors
+
+mov byte [head], 0
+inc byte [cylinder]
+
+.check_sectors:
+dec word [sectors_count]
+jnz .loop
+
+.inf_loop:
+jmp $
+
+jmp 0x7e00:0x0
+
+.error:
+jmp $
+
+boot_drive: db 0
+sectors_count: dw 0
+cylinder: db 0
+head: db 0
+sector: db 0
+
+times 510-($-$$) db 0
+dw 0xAA55
+
