@@ -60,6 +60,10 @@ inc byte [cylinder]
 dec word [sectors_count]
 jnz .loop
 
+mov byte [cylinder], 0
+mov byte [head], 0
+mov byte [sector], 0
+
 .inf_loop:
 jmp $
 
