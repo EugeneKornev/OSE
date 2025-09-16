@@ -3,6 +3,7 @@
 
 mov [boot_drive], dl
 
+cli
 xor ax, ax ; setting stack
 mov ss, ax
 mov sp, 0x7c00
@@ -10,6 +11,7 @@ mov sp, 0x7c00
 mov ax, 0x7e0 ; setting es 
 mov es, ax
 xor bx, bx
+mov ds, bx
 
 mov ax, N
 xor dx, dx
@@ -46,12 +48,12 @@ xor bx, bx
 
 inc byte [sector]
 cmp byte [sector], 18 ; sectors count on floppy
-jle .check_sectors
+jbe .check_sectors
 
 mov byte [sector], 1
 inc byte [head]
 cmp byte [head], 2
-jl .check_sectors
+jb .check_sectors
 
 mov byte [head], 0
 inc byte [cylinder]
@@ -80,4 +82,3 @@ sector: db 0
 
 times 510-($-$$) db 0
 dw 0xAA55
-

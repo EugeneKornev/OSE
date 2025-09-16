@@ -11,12 +11,12 @@ NASM = nasm -f bin
 all: clean build test
 
 .tmp/boot.bin: src/boot.asm
-	$(NASM) src/boot.asm -o .tmp/boot.bin -dN=0x4096
+	$(NASM) src/boot.asm -o .tmp/boot.bin -dN=230912
 
 boot.img: .tmp/boot.bin
 	dd if=/dev/zero of=boot.img bs=1024 count=1440
 	dd if=.tmp/boot.bin of=boot.img conv=notrunc
-	dd if=/dev/random of=boot.img bs=512 seek=1 conv=notrunc count=42
+	dd if=/dev/random of=boot.img bs=512 seek=1 conv=notrunc count=451
 
 build: boot.img
 
