@@ -1,6 +1,8 @@
 [BITS 16]
 [ORG 0x7c00]
 
+%define sectors ((N / 512) + ((N % 512) != 0))
+
 mov [boot_drive], dl
 
 cli
@@ -13,16 +15,7 @@ mov es, ax
 xor bx, bx
 mov ds, bx
 
-mov ax, N
-xor dx, dx
-mov cx, 0x200
-div cx ; 512
-test dx, dx
-jz .no_extra
-inc ax
-
-.no_extra:
-mov word [sectors_count], ax
+mov word [sectors_count], sectors
 
 mov [cylinder], byte 0
 mov [head], byte 0
