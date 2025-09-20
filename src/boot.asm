@@ -15,8 +15,8 @@ mov ds, bx
 
 mov word [sectors_count], sectors
 
-mov ch, 0
-mov dh, 0
+xor ch, ch
+xor dh, dh
 mov cl, 2
 
 .loop:
@@ -41,7 +41,7 @@ inc dh
 cmp dh, 2
 jb .check_sectors
 
-mov dh, 0
+xor dh, dh
 inc ch
 
 .check_sectors:
