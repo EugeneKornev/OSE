@@ -13,7 +13,7 @@ mov es, ax
 xor bx, bx
 mov ds, bx
 
-mov word di, sectors
+mov di, sectors
 
 xor ch, ch
 xor dh, dh
