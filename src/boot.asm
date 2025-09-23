@@ -13,7 +13,7 @@ mov es, ax
 xor bx, bx
 mov ds, bx
 
-mov word [sectors_count], sectors
+mov word di, sectors
 
 xor ch, ch
 xor dh, dh
@@ -38,14 +38,14 @@ jbe .check_sectors
 
 mov cl, 1
 inc dh
-cmp dh, 2
-jb .check_sectors
+cmp dh, 1
+jbe .check_sectors
 
 xor dh, dh
 inc ch
 
 .check_sectors:
-dec word [sectors_count]
+dec di
 jnz .loop
 
 
@@ -56,8 +56,6 @@ jmp 0x7e00:0x0
 
 .error:
 jmp $
-
-sectors_count: dw 0
 
 times 510-($-$$) db 0
 dw 0xAA55
