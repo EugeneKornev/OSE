@@ -2,11 +2,11 @@
 # Variables
 
 # Build tools
-NASM = nasm -felf64
+NASM = nasm -felf
 
 
 # Flags
-GCC_FLAGS = -std=c99 -m i386 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
+GCC_FLAGS = gcc -std=c99 -m32 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
 
 
 # =============================================================================
@@ -18,10 +18,10 @@ all: clean build test
 	$(NASM) src/boot.asm -o .tmp/boot.o -dN=0xA000
 
 .tmp/main.o: src/main.c
-	gcc $(GCC_FALGS) -c src/main.c -o .tmp/main.o
+	$(GCC_FLAGS) -c src/main.c -o .tmp/main.o
 
 .tmp/os.elf: .tmp/boot.o .tmp/main.o link.ld
-	ld -s .tmp/main.o .tmp/boot.o -T link.ld -o .tmp/os.elf
+	ld -m elf_i386 -s .tmp/main.o .tmp/boot.o -T link.ld -o .tmp/os.elf
 
 .tmp/os.bin: .tmp/os.elf
 	objcopy -I elf32-i386 -O binary .tmp/os.elf .tmp/os.bin
