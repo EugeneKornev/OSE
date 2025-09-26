@@ -24,7 +24,7 @@ mov ax, 0x201
 
 int 0x13
 
-jc error
+jc $
 
 mov ax, es
 add ax, 0x20 ; = 32 = 512 / 16
@@ -74,10 +74,6 @@ global inf_loop
 inf_loop:
     jmp inf_loop
 
-
-[BITS 16]
-error:
-jmp error
 
 gdt_desc:
     dw 0x17 ; = 23 = 24 - 1 to contain all 65536 descriptors; GDT limit
