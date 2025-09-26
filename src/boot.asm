@@ -1,5 +1,4 @@
 [BITS 16]
-[ORG 0x7c00]
 
 %define sectors ((N / 512) + ((N % 512) != 0))
 
@@ -25,7 +24,7 @@ mov ax, 0x201
 
 int 0x13
 
-jc .error
+jc error
 
 mov ax, es
 add ax, 0x20 ; = 32 = 512 / 16
@@ -49,13 +48,67 @@ dec di
 jnz .loop
 
 
-.inf_loop:
-jmp $
+lgdt [gdt_desc] ; GDTR = gdt_desc, pseudo descriptor
+cld ; clear direction flag, df = 0; value fixed in ABI
 
-jmp 0x7e00:0x0
+mov eax, cr0 ; control register
+or eax, 1
+mov cr0, eax
 
-.error:
-jmp $
+jmp code_segment:tramp ; recommended
+
+[BITS 32]
+tramp: ;s setting data registers
+mov eax, data_segment
+mov ds, eax
+mov ss, eax
+mov es, eax
+mov fs, eax
+mov gs, eax
+
+extern kernel_entry
+call kernel_entry
+
+
+global inf_loop
+inf_loop:
+    jmp inf_loop
+
+
+[BITS 16]
+error:
+jmp error
+
+gdt_desc:
+    dw 0x17 ; = 23 = 24 - 1 to contain all 65536 descriptors; GDT limit
+    dd gdt ; linear address
+
+
+align 8
+gdt:
+    .null: dq 0 ; null descriptor
+    code_segment_desc:
+                        .limit_low: dw 0xff
+                        .base_low: dw 0
+                        .base_mid: db 0
+                        .P_DPL_S_type db 0b10011010 ; P(1) - segment present flag; DPL(2) - descriptor privilege level; S(1) - descriptor
+                        ; type flag (0 for data/code, 1 for ...); Type(4) - type of segment, highest bit: 0 -> data | 1 -> code: exec_flag, direction,
+                        ; write_enable, accessed_flag
+                        .G_B_0_AVL_limit_high: db 0b11001111 ; G(1) - granularity flag, ; B(1) - =1, uses with Type; L_flag(1) = 0 - ...; AVL(1) -
+                        ; available bit
+                        .base_high: db 0
+    data_segment_desc:
+                        .limit_low: dw 0xff
+                        .base_low: dw 0
+                        .base_mid: db 0
+                        .P_DPL_S_type: db 0b10010010
+                        .G_B_0_AVL_limit_high: db 0b1100_1111
+                        .base_high: db 0
+
+
+code_segment equ 0x08
+data_segment equ 0x10
+; 15 - 3: index in gdt; 2: TI (0 for gdt); 1 - 0: PL(privilege level -> 0)
 
 times 510-($-$$) db 0
 dw 0xAA55
