@@ -2,7 +2,7 @@
 #include "panic.h"
 
 
-static u8 arena_end = (u8) 0x400000;
+static u8* arena_end = (u8*) 0x400000;
 static u8* current_address = (u8*) 0x100000;
 
 
