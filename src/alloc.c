@@ -2,8 +2,8 @@
 #include "panic.h"
 
 
-static u32 arena_end = 0x400000;
-static u32* current_address = (u32*) 0x100000;
+static u8 arena_end = (u8) 0x400000;
+static u8* current_address = (u8*) 0x100000;
 
 
 void* malloc_linear(u32 size, u32 align) {
