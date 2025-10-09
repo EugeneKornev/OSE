@@ -1,8 +1,6 @@
 #include "panic.h"
 #include "vga.h"
-
-extern void cli();
-extern void inf_loop();
+#include "types.h"
 
 void vpanic(const char* format, va_list args) {
     cli();

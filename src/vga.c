@@ -5,32 +5,39 @@
 #include <stdbool.h>
 
 
+#define UPDATE_VGA_FIELD(x, y, MASK, SHIFT, VALUE) { \
+    u16 temp_char = *(buffer_start + (y) * columns + (x)); \
+    temp_char = (temp_char & ~(MASK)) | ((VALUE) << (SHIFT)); \
+    *(buffer_start + (y) * columns + (x)) = temp_char; \
+}
+    
+
 static u32 columns = 80;
 static u32 rows = 25;
 static u16* buffer_start = (u16*) 0xB8000;
 static u32 cur_x = 0;
 static u32 cur_y = 0;
 
-static inline void put_vga_s(u16 c, u32 x, u32 y) {
-    *(buffer_start + y * columns + x) = c;
-}
 
 static inline void put_char(u8 c, u32 x, u32 y) {
-    u16 temp_char = *(buffer_start + y * columns + x) & 0xff00;
-    temp_char |= c;
-    put_vga_s(temp_char, x, y);
+    //u16 temp_char = *(buffer_start + y * columns + x) & 0xff00;
+    //temp_char |= c;
+    //put_vga_s(temp_char, x, y);
+    UPDATE_VGA_FIELD(x, y, 0xff, 0, c);
 }
 
 static inline void put_fg_color(u8 color, u32 x, u32 y) {
-    u16 temp_char = *(buffer_start + y * columns + x) & 0xf0ff;
-    temp_char |= color << 8;
-    put_vga_s(temp_char, x, y);
+    //u16 temp_char = *(buffer_start + y * columns + x) & 0xf0ff;
+    //temp_char |= color << 8;
+    //put_vga_s(temp_char, x, y);
+    UPDATE_VGA_FIELD(x, y, 0xf00, 8, color);
 }
 
 static inline void put_bg_color(u8 color, u32 x, u32 y) {
-    u16 temp_char = *(buffer_start + y * columns + x) & 0xfff;
-    temp_char |= color << 12;
-    put_vga_s(temp_char, x, y);
+    //u16 temp_char = *(buffer_start + y * columns + x) & 0xfff;
+    //temp_char |= color << 12;
+    //put_vga_s(temp_char, x, y);
+    UPDATE_VGA_FIELD(x, y, 0xf000, 12, color);
 }
 
 static void scroll_down() {
@@ -109,25 +116,35 @@ static void print_u(u32 n, u8 base) {
     }
     
     u8 i = 0;
-    char t_start;
+    char temp_char;
     while (n > 0) {
         u32 digit = n % base;
         if (digit < 10) {
-            t_start = '0';
+            temp_char = '0';
         } else {
-            t_start = 'a';
+            temp_char = 'a';
             digit -= 10;
         }
-        buffer[i] = t_start + digit;
+        buffer[i] = temp_char + digit;
         i++;
         n /= base;
     }
 
-    for (u8 j = 32; j-- > 0; ){
-        if (!buffer[j]) {
-            continue;
+    if (base == 16) {
+        for (u8 j = 8; j-- > 0;) {
+            if (!buffer[j]) {
+                print_char('0');
+            } else {
+                print_char(buffer[j]);
+            }
         }
-        print_char(buffer[j]);
+    } else {
+        for (u8 j = 32; j-- > 0; ){
+            if (!buffer[j]) {
+                continue;
+            }
+            print_char(buffer[j]);
+        }
     }
 }
 
@@ -150,8 +167,9 @@ void vprintf(const char* format, va_list args) {
                         break;
                     }
                 case 'x': {
-                         i32 n = va_arg(args, i32);
-                         print_s(n, 16);
+                         print_string("0x");
+                         i32 n = va_arg(args, u32);
+                         print_u(n, 16);
                          break;
                     }
                 case 'c': {

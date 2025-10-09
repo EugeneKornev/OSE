@@ -1,5 +1,8 @@
 #pragma once
 
+extern void inf_loop();
+extern void cli();
+
 typedef char i8;
 typedef unsigned char u8;
 

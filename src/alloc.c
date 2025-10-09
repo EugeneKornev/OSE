@@ -19,7 +19,7 @@ void* malloc_linear(u32 size, u32 align) {
         current_address += (align - (u32) current_address % align);
     }
 
-    if ((u32) current_address + size > arena_end) {
+    if ((u32) current_address + size > (u32) arena_end) {
         panic("Failed to alloc %d byted. Last allocated address: %x", size, current_address);
     }
 
