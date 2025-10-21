@@ -20,23 +20,14 @@ static u32 cur_y = 0;
 
 
 static inline void put_char(u8 c, u32 x, u32 y) {
-    //u16 temp_char = *(buffer_start + y * columns + x) & 0xff00;
-    //temp_char |= c;
-    //put_vga_s(temp_char, x, y);
     UPDATE_VGA_FIELD(x, y, 0xff, 0, c);
 }
 
 static inline void put_fg_color(u8 color, u32 x, u32 y) {
-    //u16 temp_char = *(buffer_start + y * columns + x) & 0xf0ff;
-    //temp_char |= color << 8;
-    //put_vga_s(temp_char, x, y);
     UPDATE_VGA_FIELD(x, y, 0xf00, 8, color);
 }
 
 static inline void put_bg_color(u8 color, u32 x, u32 y) {
-    //u16 temp_char = *(buffer_start + y * columns + x) & 0xfff;
-    //temp_char |= color << 12;
-    //put_vga_s(temp_char, x, y);
     UPDATE_VGA_FIELD(x, y, 0xf000, 12, color);
 }
 
