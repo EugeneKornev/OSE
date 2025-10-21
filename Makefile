@@ -3,11 +3,13 @@
 
 # Build tools
 NASM = nasm -felf
+GCC_TEST = gcc -std=c99 -m32 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
+GCC_DEBUG = gcc -std=c99 -m32 -O0 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector -DDEBUG
+LD = ld -m elf_i386 -T link.ld -s
 
 
-# Flags
-GCC_FLAGS = gcc -std=c99 -m32 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
-
+SRC = $(wildcard src/*.c)
+C_OBJ = $(patsubst src/%.c,.tmp/%.o,$(SRC))
 
 # =============================================================================
 # Tasks
@@ -17,11 +19,11 @@ all: clean build test
 .tmp/boot.o: src/boot.asm
 	$(NASM) src/boot.asm -o .tmp/boot.o -dN=0xA000
 
-.tmp/main.o: src/main.c
-	$(GCC_FLAGS) -c src/main.c -o .tmp/main.o
+.tmp/%.o: src/%.c
+	$(GCC_DEBUG) -c $< -o $@
 
-.tmp/os.elf: .tmp/boot.o .tmp/main.o link.ld
-	ld -m elf_i386 -s .tmp/main.o .tmp/boot.o -T link.ld -o .tmp/os.elf
+.tmp/os.elf: .tmp/boot.o $(C_OBJ) link.ld
+	$(LD) .tmp/boot.o $(C_OBJ) -o .tmp/os.elf
 
 .tmp/os.bin: .tmp/os.elf
 	objcopy -I elf32-i386 -O binary .tmp/os.elf .tmp/os.bin

@@ -74,6 +74,11 @@ global inf_loop
 inf_loop:
     jmp inf_loop
 
+global cli
+cli:
+    cli
+    ret
+
 
 gdt_desc:
     dw 0x17 ; = 23 = 24 - 1 to contain all 65536 descriptors; GDT limit
