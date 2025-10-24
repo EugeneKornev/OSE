@@ -105,10 +105,10 @@ static void print_string(const char* str) {
 
 
 static void print_u(u32 n, u8 base) {
-    if (n == 0) {
-        print_char('0');
-        return;
-    }
+    //if (n == 0) {
+    //    print_char('0');
+    //    return;
+    //}
     
     char buffer[32];
     for (u8 k = 0; k < 32; k++) {
