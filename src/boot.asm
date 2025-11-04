@@ -109,14 +109,11 @@ collect_context:
     mov fs, eax
     mov gs, eax
 
-    mov ebx, esp ; stack alignment
-    mov eax, 12
-    mov ecx, esp
-    and ecx, 0xF
-    sub eax, ecx
-    sub esp, eax
+    mov ebx, esp
+    sub esp, 4 ; stack alignment
+    and esp, -16
+    mov dword [esp], ebx ; store original stack, 33 slide
 
-    push ebx ; store original stack, 33 slide
     call universal_handler
     mov esp, ebx
     popa
@@ -145,7 +142,7 @@ div_zero:
 
 global pseudo_syscall
 pseudo_syscall:
-    int 0x14
+    int 0x21
     ret
 
 

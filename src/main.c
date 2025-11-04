@@ -1,9 +1,9 @@
-#include "assert.h"
-#include "vga.h"
 #include "alloc.h"
-#include "types.h"
-#include "panic.h"
+#include "assert.h"
 #include "interrupts.h"
+#include "panic.h"
+#include "types.h"
+#include "vga.h"
 
 void kernel_entry() {
     
@@ -13,8 +13,8 @@ void kernel_entry() {
     setup_interrupts();
     setup_reg();
 
-    div_zero();
-    //pseudo_syscall();
+    //div_zero();
+    pseudo_syscall();
     //sti();
     
     inf_loop();

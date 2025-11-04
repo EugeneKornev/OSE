@@ -7,7 +7,7 @@
 
 static u32 tramp_size = 8;
 static u32 vectors_count = 256;
-static u8 int_with_error_code[8] = {0x8, 0xA, 0xB, 0xC, 0xD, 0xE, 0x11, 0x15}; // 2974
+static u8 int_with_error_code[10] = {0x8, 0xA, 0xB, 0xC, 0xD, 0xE, 0x11, 0x15, 0x1d, 0x1e}; // 2974
 
 extern void collect_context(); // in boot.asm
 
@@ -34,6 +34,15 @@ struct interrupt_context {
 };
 
 
+static bool vector_has_error_code(u8 vector) {
+    for (u8 i = 0; i < 10; i++) {
+        if (int_with_error_code[i] == vector) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 static void* gen_idt() {
     u8* tramps = malloc_linear(tramp_size * vectors_count, 8);
@@ -44,12 +53,7 @@ static void* gen_idt() {
         // jmp collect_context
         // 1 + 1 + 1 + 1 + 4 = push eax + push + vector + jmp + address = 8
 
-        bool has_error_code = false;
-        for (u8 i = 0; i < 8; i++) {
-            if (int_with_error_code[i] == vector) {
-                has_error_code = true;
-            }
-        }
+        bool has_error_code = vector_has_error_code(vector);
 
         u8* tramp = tramps + vector * tramp_size;
         u32 offset = 0;
