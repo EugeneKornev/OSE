@@ -3,8 +3,8 @@
 
 # Build tools
 NASM = nasm -felf
-GCC_TEST = gcc -std=c99 -m32 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
-GCC_DEBUG = gcc -std=c99 -m32 -O0 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector -DDEBUG
+GCC_TEST = gcc -std=c23 -m32 -O2 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector
+GCC_DEBUG = gcc -std=c23 -m32 -O0 -ffreestanding -no-pie -fno-pie -mno-sse -fno-stack-protector -DDEBUG
 LD = ld -m elf_i386 -T link.ld -s
 
 
