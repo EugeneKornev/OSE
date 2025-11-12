@@ -79,6 +79,72 @@ cli:
     cli
     ret
 
+global sti
+sti:
+    sti
+    ret
+
+
+global lidt
+lidt:
+    mov eax, dword [esp + 4]
+    lidt [eax]
+    ret
+
+extern universal_handler
+
+global collect_context
+collect_context:
+    push ds
+    push es
+    push fs
+    push gs
+    pusha ; 11 slide
+
+    cld ; clear direction flag
+
+    mov eax, data_segment ; reset segment registers
+    mov ds, eax ; 20 slide
+    mov es, eax
+    mov fs, eax
+    mov gs, eax
+
+    mov ebx, esp
+    sub esp, 4 ; stack alignment
+    and esp, -16
+    mov dword [esp], ebx ; store original stack, 33 slide
+
+    call universal_handler
+    mov esp, ebx
+    popa
+    pop gs
+    pop fs
+    pop es
+    pop ds
+    add esp, 8 ; clear error code and interrupt vector
+    iret
+
+global setup_reg
+setup_reg:
+    mov eax, 0
+    mov ebx, 1
+    mov ecx, 2
+    mov edx, 3
+    mov edi, 4
+    mov esi, 5
+    mov ebp, 6
+    ret
+
+global div_zero
+div_zero:
+    idiv eax
+    ret
+
+global pseudo_syscall
+pseudo_syscall:
+    int 0x21
+    ret
+
 
 gdt_desc:
     dw 0x17 ; = 23 = 24 - 1 to contain all 65536 descriptors; GDT limit
