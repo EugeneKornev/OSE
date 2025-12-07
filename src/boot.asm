@@ -124,6 +124,46 @@ collect_context:
     add esp, 8 ; clear error code and interrupt vector
     iret
 
+
+
+global readFromPort
+readFromPort:
+    ; esp + 4 = port
+    mov dx, word [esp + 4]
+    in al, dx
+    ret
+
+global writeToPort
+writeToPort:
+    ; esp + 4 = port
+    ; esp + 8 = data
+    mov dx, word [esp + 4]
+    mov al, byte [esp + 8]
+
+    out dx, al
+
+    push edi
+    push esi
+
+    mov edi, eax
+
+    ; delay loop
+    mov esi, 0x1 ; loop size
+
+.loop:
+    dec esi
+    jz .continue
+    xor eax, eax
+    cpuid
+    jmp .loop
+
+.continue:
+    mov eax, edi
+    pop esi
+    pop edi
+    ret
+
+
 global setup_reg
 setup_reg:
     mov eax, 0
