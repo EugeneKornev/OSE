@@ -29,15 +29,15 @@ typedef struct {
 } interrupt_desc;
 
 
-struct interrupt_context {
-    u32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    alignas(4) u16 gs, fs, es, ds;
-    alignas(4) u8 int_vector; // made by trampoline
-    u32 error_code;
-    u32 eip;
-    alignas(4) u16 cs;
-    u32 eflags;
-};
+//struct interrupt_context {
+//    u32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
+//    alignas(4) u16 gs, fs, es, ds;
+//    alignas(4) u8 int_vector; // made by trampoline
+//    u32 error_code;
+//    u32 eip;
+//    alignas(4) u16 cs;
+//    u32 eflags;
+//};
 
 
 static bool vector_has_error_code(u8 vector) {
@@ -86,9 +86,18 @@ static void* gen_idt() {
         idt[vector].offset_high = ((u32)(tramps + tramp_size * vector) >> 16) & 0xFFFF;
     }
 
+
+    idt[0x30].dpl = 3;
+    //idt[0x30].P = 0b0;
+
     //idt[0x20].gate_desc_type = 0b111; // set timer handler to trap gate
     //idt[0x21].gate_desc_type = 0b111; // set keyboard handler to trap gate
     return idt;
+}
+
+void syscall_handler(struct interrupt_context* context) {
+    printf("%d ", context->eax);
+    
 }
     
 void* setup_interrupts() {
@@ -192,6 +201,8 @@ void timer_handler(struct interrupt_context* context) {
     //              context->eflags);
     //
     //printf("%d ", global_counter++);
+    //
+    //printf("%x\n, get_esp()");
 
     //set_master_mask(2); // mask timer in PIC
 
@@ -208,7 +219,7 @@ void timer_handler(struct interrupt_context* context) {
     //sti();
     //inf_loop();
     //
-    //global_counter = 0;
+    global_counter = 0;
     return;
 }
 
@@ -239,6 +250,9 @@ void universal_handler(struct interrupt_context* context) {
             break;
         case 0x21:
             keyboard_handler(context);
+            break;
+        case 0x30:
+            syscall_handler(context);
             break;
         default:
             panic("unhandled interrupt #%x at %x:%x\n\n"

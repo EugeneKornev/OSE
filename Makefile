@@ -41,10 +41,10 @@ clean:
 	mkdir .tmp
 
 test: build
-	qemu-system-i386 -cpu pentium2 -m 1g -fda boot.img -monitor stdio -device VGA
+	qemu-system-i386 -cpu pentium2 -m 4g -fda boot.img -monitor stdio -device VGA
 
 debug: build
-	qemu-system-i386 -cpu pentium2 -m 1g -fda boot.img -monitor stdio -device VGA -s -S &
+	qemu-system-i386 -cpu pentium2 -m 4g -fda boot.img -monitor stdio -device VGA -s -S &
 	gdb -x .gdbinit
 
 .PHONY: all build clean test debug

@@ -19,6 +19,12 @@ extern void div_zero();
 extern void pseudo_syscall();
 extern void lidt(u64* idt_address);
 extern void setup_reg();
+extern u32 eflags();
+extern void restore_context(void* context);
+extern void syscall_expr(int n);
+extern u32 get_esp();
+extern void not_allowed();
+extern u64 code_segment_desc;
 
 #define NULL ((void*) 0)
 
